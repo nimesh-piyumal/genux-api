@@ -21,12 +21,12 @@ import {
   faSun,
   faBars
 } from '@fortawesome/free-solid-svg-icons';
+import Footer from './components/Footer';
 
 export default function ApiDocumentation() {
   const [searchQuery, setSearchQuery] = useState("");
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState("2025-04-02 14:12:45");
   const [activeCategory, setActiveCategory] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -35,8 +35,40 @@ export default function ApiDocumentation() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const searchInputRef = useRef(null);
+
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = new Date();
+    // Format the time in Asia/Colombo timezone
+    return new Date().toLocaleString('en-US', {
+      timeZone: 'Asia/Colombo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$1-$2').replace(',', '');
+  });
   
   useEffect(() => {
+    // Update time every minute
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const formattedTime = now.toLocaleString('en-US', {
+        timeZone: 'Asia/Colombo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$1-$2').replace(',', '');
+      
+      setCurrentTime(formattedTime);
+    }, 60000); 
+
     // Check system preference for dark mode
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setDarkMode(prefersDark);
@@ -60,16 +92,10 @@ export default function ApiDocumentation() {
 
     fetchApiData();
     
-    // Update time every minute
-    const intervalId = setInterval(() => {
-      const now = new Date();
-      const formattedTime = now.toISOString().replace('T', ' ').substring(0, 19);
-      setCurrentTime(formattedTime);
-    }, 60000);
-    
     return () => clearInterval(intervalId);
   }, []);
 
+  
   // Add keyboard shortcut for search
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -597,27 +623,7 @@ export default function ApiDocumentation() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className={`mt-12 py-6 ${darkMode ? 'bg-slate-800 border-t border-slate-700' : 'bg-white border-t border-slate-200'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <div className="flex items-center">
-                <FontAwesomeIcon icon={faCode} className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="ml-2 font-bold">GENUX API</span>
-              </div>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                © 2025 GENUX Technologies. All rights reserved.
-              </p>
-            </div>
-            <div className="flex space-x-4">
-              <a href="#" className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">Documentation</a>
-              <a href="#" className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">Support</a>
-              <a href="#" className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">Contact</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer darkMode={darkMode} />
 
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {
