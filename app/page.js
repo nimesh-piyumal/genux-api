@@ -83,10 +83,10 @@ export default function ApiDocumentation() {
         const response = await fetch('/data/api-data.json');
         const data = await response.json();
         setApiData(data);
-        // Set first category as active by default
-        if (data && data.categories) {
-          setActiveCategory(Object.keys(data.categories)[0]);
-        }
+        // Remove this line to keep activeCategory as null (All APIs)
+        // if (data && data.categories) {
+        //   setActiveCategory(Object.keys(data.categories)[0]);
+        // }
         setLoading(false);
       } catch (error) {
         console.error("Error loading API data:", error);
@@ -125,7 +125,7 @@ export default function ApiDocumentation() {
     name,
     endpoints: endpointIds.map(id => 
       apiData.apiList.find(api => api.id === id)
-    ).filter(endpoint => endpoint && endpoint.active)
+    ).filter(endpoint => endpoint) // Remove the active filter to show all endpoints
   })) : [];
 
   // Filter categories and endpoints based on search and filters
@@ -266,32 +266,33 @@ export default function ApiDocumentation() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Filter and Category Tabs */}
             <div className="mb-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-                  {searchQuery ? `Search Results` : activeCategory ? `${activeCategory} API` : 'All Endpoints'}
-                </h2>
-                
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="all">All Status</option>
-                      <option value="stable">Stable Only</option>
-                      <option value="beta">Beta Only</option>
-                      <option value="deprecated">Deprecated</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <FontAwesomeIcon icon={faCaretDown} className="h-4 w-4 text-slate-400" />
-                    </div>
-                  </div>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
+                    {searchQuery ? `Search Results` : activeCategory ? `${activeCategory} API` : 'All APIs'}
+                  </h2>
                 </div>
-              </div>
               
               {/* Category Pills - Desktop */}
               <div className="hidden md:flex overflow-x-auto pb-2 space-x-2">
+                <motion.button
+                  onClick={() => setActiveCategory(null)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                    activeCategory === null 
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md' 
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  All APIs
+                  <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
+                    activeCategory === null
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                  }`}>
+                    {processedCategories.reduce((total, cat) => total + cat.endpoints.length, 0)}
+                  </span>
+                </motion.button>
                 {processedCategories.map((category) => (
                   <motion.button
                     key={category.name}
@@ -370,7 +371,7 @@ export default function ApiDocumentation() {
                 ) : (
                   /* Category View */
                   <>
-                    {activeCategory && (
+                    {activeCategory ? (
                       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {processedCategories
                           .find(cat => cat.name === activeCategory)?.endpoints
@@ -385,6 +386,23 @@ export default function ApiDocumentation() {
                               darkMode={darkMode}
                             />
                           ))}
+                      </div>
+                    ) : (
+                      /* All APIs View */
+                      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {processedCategories.flatMap((category) => 
+                          category.endpoints.map((endpoint) => (
+                            <EndpointCard 
+                              key={endpoint.id}
+                              endpoint={endpoint}
+                              category={category.name}
+                              handleCopyPath={handleCopyPath}
+                              copiedPath={copiedPath}
+                              setSelectedEndpoint={setSelectedEndpoint}
+                              darkMode={darkMode}
+                            />
+                          ))
+                        )}
                       </div>
                     )}
                   </>
@@ -439,7 +457,7 @@ export default function ApiDocumentation() {
   );
 }
 
-// New component for endpoint cards
+// Update the EndpointCard component to show active/inactive indicator
 const EndpointCard = ({ endpoint, category, handleCopyPath, copiedPath, setSelectedEndpoint, darkMode }) => {
   return (
     <motion.div 
@@ -457,19 +475,14 @@ const EndpointCard = ({ endpoint, category, handleCopyPath, copiedPath, setSelec
             <FontAwesomeIcon icon={faServer} className="h-5 w-5 text-blue-500 mr-2" />
             <h3 className="font-semibold">{endpoint.name}</h3>
           </div>
-          {endpoint.status === 'stable' && (
+          {endpoint.active && (
             <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 font-medium">
-              Stable
+              Active
             </span>
           )}
-          {endpoint.status === 'beta' && (
-            <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 font-medium">
-              Beta
-            </span>
-          )}
-          {endpoint.status === 'deprecated' && (
+          {endpoint.active === false && (
             <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300 font-medium">
-              Deprecated
+              Inactive
             </span>
           )}
         </div>

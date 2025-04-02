@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolder, faFolderOpen, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faFolderOpen, faTimes, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CategorySidebar = ({ 
@@ -10,6 +10,9 @@ const CategorySidebar = ({
   closeSidebar,
   sidebarOpen
 }) => {
+  // Calculate total endpoints across all categories
+  const totalEndpoints = categories.reduce((total, cat) => total + cat.endpoints.length, 0);
+  
   return (
     <AnimatePresence>
       {sidebarOpen && (
@@ -38,6 +41,41 @@ const CategorySidebar = ({
             </div>
             
             <div className="space-y-2">
+              {/* All APIs category */}
+              <motion.button
+                onClick={() => {
+                  setActiveCategory(null);
+                  if (window.innerWidth < 768) {
+                    closeSidebar();
+                  }
+                }}
+                className={`w-full text-left px-4 py-3 rounded-lg flex items-center transition-all ${
+                  activeCategory === null 
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md' 
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <FontAwesomeIcon 
+                  icon={faLayerGroup} 
+                  className={`mr-3 ${
+                    activeCategory === null 
+                      ? 'text-white' 
+                      : 'text-blue-500 dark:text-blue-400'
+                  }`}
+                />
+                <span className="font-medium">All APIs</span>
+                <span className={`ml-auto px-2.5 py-1 text-xs rounded-full ${
+                  activeCategory === null
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                }`}>
+                  {totalEndpoints}
+                </span>
+              </motion.button>
+              
+              {/* Category buttons */}
               {categories.map((category) => (
                 <motion.button
                   key={category.name}
@@ -75,6 +113,7 @@ const CategorySidebar = ({
               ))}
             </div>
             
+            {/* Help section */}
             <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
               <div className="rounded-lg bg-blue-50 dark:bg-slate-700/50 p-4">
                 <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Need Help?</h3>
