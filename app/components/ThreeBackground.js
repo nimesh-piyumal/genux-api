@@ -9,48 +9,66 @@ export default function ThreeBackground({ darkMode }) {
   useEffect(() => {
     if (!mountRef.current) return;
 
-    // Scene setup
+    // Scene setup with improved visuals
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ 
       alpha: true,
-      antialias: true // Add antialiasing for smoother rendering
+      antialias: true,
+      powerPreference: "high-performance"
     });
     
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(darkMode ? 0x1a202c : 0xf7fafc, 0.3); // Add slight background color
+    renderer.setClearColor(darkMode ? 0x111827 : 0xf8fafc, 0.2); // Subtle background color
     mountRef.current.appendChild(renderer.domElement);
 
-    // Create particles
+    // Create particles with improved aesthetics
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 2000; // Reduced for better performance
+    const particlesCount = darkMode ? 2500 : 2000; // More particles in dark mode
     const posArray = new Float32Array(particlesCount * 3);
 
     for(let i = 0; i < particlesCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 10; // Increased spread
+      posArray[i] = (Math.random() - 0.5) * 12; // Wider spread
     }
 
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-    // Material with improved visibility
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.008, // Increased size
-      color: darkMode ? 0x4a5568 : 0xe2e8f0,
+    // Create two particle systems for depth effect
+    const particlesMaterial1 = new THREE.PointsMaterial({
+      size: 0.01,
+      color: darkMode ? 0x4a5568 : 0xdbe4ff,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.7,
       sizeAttenuation: true,
     });
 
-    // Mesh
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
+    const particlesMaterial2 = new THREE.PointsMaterial({
+      size: 0.005,
+      color: darkMode ? 0x2d3748 : 0xbfdbfe,
+      transparent: true,
+      opacity: 0.5,
+      sizeAttenuation: true,
+    });
+
+    // Create meshes
+    const particlesMesh1 = new THREE.Points(particlesGeometry, particlesMaterial1);
+    const particlesMesh2 = new THREE.Points(particlesGeometry.clone(), particlesMaterial2);
+    
+    // Position second mesh slightly differently
+    particlesMesh2.position.z = -5;
+    particlesMesh2.rotation.x = Math.PI * 0.2;
+    
+    scene.add(particlesMesh1);
+    scene.add(particlesMesh2);
 
     // Camera position
     camera.position.z = 3;
 
-    // Mouse movement effect
+    // Mouse movement effect with improved responsiveness
     let mouseX = 0;
     let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
 
     const handleMouseMove = (event) => {
       mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
@@ -59,29 +77,42 @@ export default function ThreeBackground({ darkMode }) {
 
     document.addEventListener('mousemove', handleMouseMove);
 
-    // Animation
+    // Animation with smoother transitions
     let animationFrameId;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
-      particlesMesh.rotation.x += 0.0003;
-      particlesMesh.rotation.y += 0.0005;
+      targetX = mouseX * 0.001;
+      targetY = mouseY * 0.001;
+      
+      particlesMesh1.rotation.x += 0.0003;
+      particlesMesh1.rotation.y += 0.0005;
+      
+      particlesMesh2.rotation.x += 0.0002;
+      particlesMesh2.rotation.y += 0.0003;
 
-      // Smooth mouse follow with damping
-      particlesMesh.rotation.x += (mouseY * 0.0003 - particlesMesh.rotation.x) * 0.05;
-      particlesMesh.rotation.y += (mouseX * 0.0003 - particlesMesh.rotation.y) * 0.05;
+      // Smooth mouse follow with improved damping
+      particlesMesh1.rotation.x += (targetY - particlesMesh1.rotation.x) * 0.03;
+      particlesMesh1.rotation.y += (targetX - particlesMesh1.rotation.y) * 0.03;
+      
+      particlesMesh2.rotation.x += (targetY - particlesMesh2.rotation.x) * 0.02;
+      particlesMesh2.rotation.y += (targetX - particlesMesh2.rotation.y) * 0.02;
 
       renderer.render(scene, camera);
     };
 
-    // Handle resize
+    // Handle resize with debouncing
+    let resizeTimeout;
     const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
 
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }, 100);
     };
 
     window.addEventListener('resize', handleResize);
@@ -98,9 +129,12 @@ export default function ThreeBackground({ darkMode }) {
       }
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousemove', handleMouseMove);
-      scene.remove(particlesMesh);
+      
+      scene.remove(particlesMesh1);
+      scene.remove(particlesMesh2);
       particlesGeometry.dispose();
-      particlesMaterial.dispose();
+      particlesMaterial1.dispose();
+      particlesMaterial2.dispose();
       renderer.dispose();
     };
   }, [darkMode]);
@@ -114,7 +148,7 @@ export default function ThreeBackground({ darkMode }) {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: -1, // Changed to -1 to ensure it stays behind content
+        zIndex: -1,
         pointerEvents: 'none',
         overflow: 'hidden'
       }}
