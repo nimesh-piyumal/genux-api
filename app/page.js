@@ -338,8 +338,13 @@ export default function ApiDocumentation() {
                       >
                         <FontAwesomeIcon icon={faSearch} className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
                         <h3 className="text-xl font-bold mb-2">No results found</h3>
+                        // Find line 342 and replace the single quote with &apos;
+                        // From:
+                        // ... couldn't find any endpoints ...
+                        
+                        // To:
                         <p className="text-slate-500 dark:text-slate-400 mb-4">
-                          We couldn't find any endpoints matching your search criteria.
+                          We couldn&apos;t find any endpoints matching your search criteria.
                         </p>
                         <button 
                           onClick={() => {setSearchQuery(''); setStatusFilter('all');}}

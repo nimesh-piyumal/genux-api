@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const HeroSection = ({ faSearch, searchInputRef, searchQuery, setSearchQuery, faTimes }) => {
@@ -7,7 +7,8 @@ const HeroSection = ({ faSearch, searchInputRef, searchQuery, setSearchQuery, fa
   const [typingEffect, setTypingEffect] = useState('');
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   
-  const searchExamples = ["download"];
+  // Wrap searchExamples in useMemo to prevent it from being recreated on every render
+  const searchExamples = useMemo(() => ["download"], []);
   
   useEffect(() => {
     const text = searchExamples[currentTextIndex];
@@ -24,7 +25,7 @@ const HeroSection = ({ faSearch, searchInputRef, searchQuery, setSearchQuery, fa
     }, 150);
     
     return () => clearInterval(typing);
-  }, [currentTextIndex, searchExamples]); // Added searchExamples to dependency array
+  }, [currentTextIndex, searchExamples]);
   
   const handleSearchFocus = () => {
     setIsAnimating(true);
