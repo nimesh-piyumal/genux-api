@@ -24,7 +24,7 @@ const HeroSection = ({ faSearch, searchInputRef, searchQuery, setSearchQuery, fa
     }, 150);
     
     return () => clearInterval(typing);
-  }, [currentTextIndex]);
+  }, [currentTextIndex, searchExamples]); // Added searchExamples to dependency array
   
   const handleSearchFocus = () => {
     setIsAnimating(true);

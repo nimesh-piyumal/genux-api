@@ -18,9 +18,12 @@ export default function ThreeBackground({ darkMode }) {
       powerPreference: "high-performance"
     });
     
+    // Store ref value in a variable to use in cleanup
+    const currentMount = mountRef.current;
+    
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(darkMode ? 0x111827 : 0xf8fafc, 0.2); // Subtle background color
-    mountRef.current.appendChild(renderer.domElement);
+    currentMount.appendChild(renderer.domElement);
 
     // Create particles with improved aesthetics
     const particlesGeometry = new THREE.BufferGeometry();
@@ -124,8 +127,8 @@ export default function ThreeBackground({ darkMode }) {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      if (mountRef.current) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (currentMount) {
+        currentMount.removeChild(renderer.domElement);
       }
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousemove', handleMouseMove);
