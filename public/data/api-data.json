@@ -1,0 +1,186 @@
+{
+    "categories": {
+      "Downloader": ["spotify", "ytmp3", "ytmp4", "tiktok", "fb", "ringtone", "mediafire", "wallpaper", "xnxx-download", "apk-download", "sticker-download"],
+      "Search": ["yt-search", "pornhub-search", "gis"],
+      "News": ["hiru-news", "sirasa-news", "wabetainfo"],
+      "Artificial Intelligence": ["genux", "ai-img"],
+      "Other Tools": ["screenshot", "emix", "lk-address", "tinyurl", "imgbb", "dtic", "ipwho"]
+    },
+    "apiList": [
+      {
+        "name": "IPWHO",
+        "path": "/api/other/ipwho?query=104.21.16.1",
+        "id": "ipwho",
+        "description": "Information about IP Address",
+        "active": true
+      },
+      {
+        "name": "Domain To IP Checker",
+        "path": "/api/other/dtic?query=genux.me",
+        "id": "dtic",
+        "description": "Domain To IP Checker",
+        "active": true
+      },
+      {
+        "name": "Google Image Search",
+        "path": "/api/search/gis?query=elonmusk",
+        "id": "gis",
+        "description": "Google Image Search High Quality",
+        "active": true
+      },
+      {
+        "name": "IMG BB Image",
+        "path": "/api/other/imgbb?url=https://i.kym-cdn.com/photos/images/original/002/953/792/5b8.jpeg",
+        "id": "imgbb",
+        "description": "IMG BB Image Uploader",
+        "active": true
+      },
+      {
+        "name": "Tiny Url",
+        "path": "/api/other/tinyurl?url=https://api.genux.me",
+        "id": "tinyurl",
+        "description": "Tiny Url Shortener",
+        "active": true
+      },
+      {
+        "name": "Spotify Downloader",
+        "path": "/api/download/spotify?url=https://open.spotify.com/track/3dL4YyKzNKcxYquXyRhJJJ?si=4d1160727dd342e8",
+        "id": "spotify",
+        "description": "Spotify Song Download High Quality MP3",
+        "active": true
+      },
+      {
+        "name": "YTMP3 Downloader",
+        "path": "/api/download/ytmp3?query=Mithya Mayam",
+        "id": "ytmp3",
+        "description": "Extract YouTube Video Audio And Direct Download",
+        "active": true
+      },
+      {
+        "name": "YTMP4 Downloader",
+        "path": "/api/download/ytmp4?url=https://www.youtube.com/watch?v=E1d8XOzTcGg",
+        "id": "ytmp4",
+        "description": "YouTube Video Direct Download",
+        "active": false
+      },
+      {
+        "name": "Tiktok Downloader",
+        "path": "/api/download/tiktok?url=https://vt.tiktok.com/ZSMYqMGFB/",
+        "id": "tiktok",
+        "description": "Download TikTok Videos Without Watermark",
+        "active": true
+      },
+      {
+        "name": "FB Downloader",
+        "path": "/api/download/fb?url=https://www.facebook.com/reel/2419169181776996",
+        "id": "fb",
+        "description": "Download Facebook Videos",
+        "active": true
+      },
+      {
+        "name": "Ringtone Downloader",
+        "path": "/api/download/ringtone?query=kgf",
+        "id": "ringtone",
+        "description": "Download Ringtones",
+        "active": true
+      },
+      {
+        "name": "Mediafire Downloader",
+        "path": "/api/download/mediafire?url=https://www.mediafire.com/file/32w89hy02bdpb1j/winrar.exe/file",
+        "id": "mediafire",
+        "description": "Download Mediafire Files",
+        "active": true
+      },
+      {
+        "name": "Wallpaper Downloader",
+        "path": "/api/download/wallpaper?query=car",
+        "id": "wallpaper",
+        "description": "Download HD Wallpapers",
+        "active": true
+      },
+      {
+        "name": "Xnxx Downloader",
+        "path": "/api/download/xnxx-download?query=fuck",
+        "id": "xnxx-download",
+        "description": "Xnxx Download Video High Quality",
+        "active": true
+      },
+      {
+        "name": "Pornhub Search",
+        "path": "/api/search/pornhub?query=srilanka",
+        "id": "pornhub-search",
+        "description": "Pornhub Search Video Details",
+        "active": true
+      },
+      {
+        "name": "Apk Downloader",
+        "path": "/api/download/apk?query=whatsapp",
+        "id": "apk-download",
+        "description": "Apk Download in Aptoide.com",
+        "active": true
+      },
+      {
+        "name": "Sticker Downloader",
+        "path": "/api/download/sticker?query=girl",
+        "id": "sticker-download",
+        "description": "Sticker Download in Getstickerpack.com",
+        "active": true
+      },
+      {
+        "name": "AI Image Generater",
+        "path": "/api/ai/ai-img?query=dog",
+        "id": "ai-img",
+        "description": "AI Image Generater High Quality",
+        "active": true
+      },
+      {
+        "name": "Screenshot Website",
+        "path": "/api/other/screenshot?url=https://example.com",
+        "id": "screenshot",
+        "description": "Website Full Screen Screenshot",
+        "active": true
+      },
+      {
+        "name": "Emoji MIX",
+        "path": "/api/other/emix?query=😂😃",
+        "id": "emix",
+        "description": "Funny Emoji MIX",
+        "active": true
+      },
+      {
+        "name": "LK Address",
+        "path": "/api/other/lk-address?",
+        "id": "lk-address",
+        "description": "Sri Lanka Random Address Generate",
+        "active": true
+      },
+      {
+        "name": "Hiru News",
+        "path": "/api/news/hiru-news?",
+        "id": "hiru-news",
+        "description": "Get News from Hiru News",
+        "active": true
+      },
+      {
+        "name": "Sirasa News",
+        "path": "/api/news/sirasa-news?",
+        "id": "sirasa-news",
+        "description": "Get News from Sirasa News",
+        "active": true
+      },
+      {
+        "name": "Wabetainfo",
+        "path": "/api/news/wabetainfo?platform=web",
+        "id": "wabetainfo",
+        "description": "Get News from Wabetainfo",
+        "active": true
+      },
+      {
+        "name": "Youtube Search",
+        "path": "/api/search/yt-search?query=hirupodawessa",
+        "id": "yt-search",
+        "description": "Extract YouTube Video Details",
+        "active": true
+      }
+    ]
+  }
