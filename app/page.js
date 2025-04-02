@@ -29,7 +29,6 @@ export default function ApiDocumentation() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedEndpoint, setSelectedEndpoint] = useState(null);
   const [copiedPath, setCopiedPath] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -261,71 +260,6 @@ export default function ApiDocumentation() {
             )}
           </div>
           
-          {/* Filters */}
-          <div className="mt-4 flex items-center justify-between">
-            <button 
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center text-sm text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 px-3 py-1.5 rounded-md transition-colors"
-            >
-              <FontAwesomeIcon icon={faFilter} className="mr-2" />
-              Filters
-              <FontAwesomeIcon icon={faCaretDown} className="ml-2" />
-            </button>
-            
-            <div className="text-sm text-blue-100">
-              {filteredCategories.reduce((count, category) => count + category.endpoints.length, 0)} endpoints found
-            </div>
-          </div>
-          
-          {showFilters && (
-            <div className="mt-3 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-lg">
-              <h3 className="font-medium text-slate-700 dark:text-slate-300 mb-3">Filter by Status</h3>
-              <div className="flex flex-wrap gap-2">
-                <button 
-                  onClick={() => setStatusFilter('all')} 
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    statusFilter === 'all' 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-                  }`}
-                >
-                  All
-                </button>
-                <button 
-                  onClick={() => setStatusFilter('stable')} 
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    statusFilter === 'stable' 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-                  }`}
-                >
-                  <FontAwesomeIcon icon={faCheckCircle} className="mr-1" />
-                  Stable
-                </button>
-                <button 
-                  onClick={() => setStatusFilter('beta')} 
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    statusFilter === 'beta' 
-                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' 
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-                  }`}
-                >
-                  Beta
-                </button>
-                <button 
-                  onClick={() => setStatusFilter('deprecated')} 
-                  className={`px-3 py-1.5 text-sm rounded-md ${
-                    statusFilter === 'deprecated' 
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' 
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-                  }`}
-                >
-                  <FontAwesomeIcon icon={faExclamationCircle} className="mr-1" />
-                  Deprecated
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
