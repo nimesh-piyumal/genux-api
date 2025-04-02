@@ -23,6 +23,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Footer from './components/Footer';
 import HeroSection from './components/HeroSection';
+import ThreeBackground from './components/ThreeBackground';
 
 export default function ApiDocumentation() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -171,7 +172,9 @@ export default function ApiDocumentation() {
   }
 
   return (
-    <div className={`min-h-screen font-sans ${darkMode ? 'dark bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-800'}`}>
+<div className={`min-h-screen font-sans relative ${darkMode ? 'dark bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-800'}`} style={{ zIndex: 1 }}>
+    <ThreeBackground darkMode={darkMode} />
+
       {/* Top Navigation */}
       <nav className={`${darkMode ? 'bg-slate-800' : 'bg-white'} shadow-sm sticky top-0 z-10`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
