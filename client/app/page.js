@@ -2,23 +2,27 @@
 
 import { useState, useEffect } from 'react';
 
-export default function ApiExample() {
+export default function Page() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '' });
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/data')
+    fetch('https://vigilant-space-tribble-pjg9979jw7xvcv5p-3001.app.github.dev/api/data')
       .then(res => res.json())
       .then(data => {
         setData(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
         setLoading(false);
       });
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:3001/api/submit', {
+    const response = await fetch('https://vigilant-space-tribble-pjg9979jw7xvcv5p-3001.app.github.dev/api/submit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,9 +40,8 @@ export default function ApiExample() {
     });
   };
 
-if (loading) return <div className="p-4">Loading...</div>;
+  if (loading) return <div className="p-4">Loading...</div>;
 
-export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
