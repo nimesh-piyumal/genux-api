@@ -37,9 +37,16 @@ export default function LoginPage() {
       try {
         const response = await fetch('/api/auth/check', {
           method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
         });
         
-        if (response.ok) {
+        const data = await response.json();
+        
+        if (response.ok && data.authenticated) {
           // If authenticated, redirect to home
           window.location.href = '/';
         }
