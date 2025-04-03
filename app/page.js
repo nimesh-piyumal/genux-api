@@ -536,13 +536,13 @@ const EndpointCard = ({ endpoint, category, handleCopyPath, copiedPath, setSelec
         <div className="relative group">
           <div className="px-3 py-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg font-mono text-sm overflow-x-auto">
             <div className="flex items-center justify-between">
-              <code className="text-blue-600 dark:text-blue-400">{endpoint.path}</code>
+              <code className="text-blue-600 dark:text-blue-400">https://api.genux.me{endpoint.path}</code>
               <button 
-                onClick={() => handleCopyPath(endpoint.path)}
+                onClick={() => handleCopyPath(`https://api.genux.me${endpoint.path}`)}
                 className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
                 aria-label="Copy path"
               >
-                <FontAwesomeIcon icon={copiedPath === endpoint.path ? faCheckCircle : faCopy} className="h-4 w-4" />
+                <FontAwesomeIcon icon={copiedPath === `https://api.genux.me${endpoint.path}` ? faCheckCircle : faCopy} className="h-4 w-4" />
               </button>
             </div>
           </div>
