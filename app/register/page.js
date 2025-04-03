@@ -25,35 +25,80 @@ export default function RegisterPage() {
   const [darkMode, setDarkMode] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Add useEffect to handle client-side mounting
+  // Add useEffect to handle client-side mounting and auth check
   useEffect(() => {
     setMounted(true);
     
     // Check system preference for dark mode
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setDarkMode(prefersDark);
+    
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check', {
+          method: 'GET',
+        });
+        
+        if (response.ok) {
+          // If authenticated, redirect to home
+          window.location.href = '/';
+        }
+      } catch (error) {
+        // If error, user is not authenticated, so do nothing
+        console.error('Auth check error:', error);
+      }
+    };
+    
+    checkAuth();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      alert("Passwords don't match!");
+      setError("Passwords don't match!");
       return;
     }
     
-    // Handle registration logic here
-    console.log('Register with:', name, email, password);
+    setLoading(true);
+    setError('');
     
-    // Show success message
-    setRegistered(true);
-    
-    // Reset form
-    setName('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+      
+      // Show success message
+      setRegistered(true);
+      
+      // Reset form
+      setName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Only render content after component has mounted on client
@@ -111,7 +156,7 @@ export default function RegisterPage() {
       </Link>
       
       <motion.div 
-        className="w-full max-w-md p-8 rounded-xl shadow-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm"
+        className="w-full max-w-md p-8 rounded-xl shadow-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -124,6 +169,12 @@ export default function RegisterPage() {
             Join GENUX API platform today
           </p>
         </div>
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -223,11 +274,12 @@ export default function RegisterPage() {
           <div className="pt-2">
             <motion.button
               type="submit"
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              whileHover={{ scale: loading ? 1 : 1.02 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
+              disabled={loading}
             >
-              Create Account
+              {loading ? 'Creating Account...' : 'Create Account'}
             </motion.button>
           </div>
         </form>

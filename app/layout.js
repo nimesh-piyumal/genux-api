@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Genux Rest API"
+  title: "GENUX REST API - 3.0"
 };
 
 export default function RootLayout({ children }) {

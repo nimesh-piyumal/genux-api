@@ -207,10 +207,50 @@ export default function ApiDocumentation() {
                 <FontAwesomeIcon icon={faClock} className="mr-2 text-blue-500" />
                 <span>{currentTime}</span>
               </div>
-              <div className="flex items-center text-sm bg-slate-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-full text-slate-600 dark:text-slate-400">
-                <FontAwesomeIcon icon={faUser} className="mr-2 text-blue-500" />
-                <span className="hidden sm:inline">nimesh-piyumal</span>
+              
+              {/* User profile dropdown */}
+              <div className="relative" ref={userMenuRef}>
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center text-sm bg-slate-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <FontAwesomeIcon icon={faUser} className="mr-2 text-blue-500" />
+                  <span className="hidden sm:inline">{user ? user.name : 'Guest'}</span>
+                  <FontAwesomeIcon icon={faCaretDown} className="ml-2 h-3 w-3" />
+                </button>
+                
+                {/* Dropdown menu */}
+                {showUserMenu && (
+                  <motion.div 
+                    className="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-50"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {user ? (
+                      <>
+                        <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{user.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+                        </div>
+                        <button 
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center"
+                        >
+                          <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <Link href="/login" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        Sign in
+                      </Link>
+                    )}
+                  </motion.div>
+                )}
               </div>
+              
               <motion.button 
                 onClick={toggleDarkMode}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

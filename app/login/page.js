@@ -19,22 +19,68 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Add useEffect to handle client-side mounting
+  // Add useEffect to handle client-side mounting and auth check
   useEffect(() => {
     setMounted(true);
     
     // Check system preference for dark mode
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setDarkMode(prefersDark);
+    
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check', {
+          method: 'GET',
+        });
+        
+        if (response.ok) {
+          // If authenticated, redirect to home
+          window.location.href = '/';
+        }
+      } catch (error) {
+        // If error, user is not authenticated, so do nothing
+        console.error('Auth check error:', error);
+      }
+    };
+    
+    checkAuth();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login with:', email, password);
-    // Redirect to main page after successful login
-    window.location.href = '/';
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+      
+      // Redirect to main page after successful login
+      window.location.href = '/';
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Only render content after component has mounted on client
@@ -67,6 +113,12 @@ export default function LoginPage() {
             Sign in to access GENUX API
           </p>
         </div>
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -136,11 +188,12 @@ export default function LoginPage() {
           <div>
             <motion.button
               type="submit"
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              whileHover={{ scale: loading ? 1 : 1.02 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
+              disabled={loading}
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </motion.button>
           </div>
         </form>
