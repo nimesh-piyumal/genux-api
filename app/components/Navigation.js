@@ -20,7 +20,8 @@ export default function Navigation({
   darkMode, 
   faBars, 
   faCode, 
-  faClock 
+  faClock,
+  loading
 }) {
   return (
     <div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
@@ -59,7 +60,10 @@ export default function Navigation({
                 className="flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700"
               >
                 <div className="flex items-center">
-                  {user && user.profilePicture ? (
+                  {loading ? (
+                    <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center animate-pulse">
+                    </div>
+                  ) : user && user.profilePicture ? (
                     <div className="h-8 w-8 rounded-full overflow-hidden mr-2">
                       <img 
                         src={user.profilePicture} 
@@ -72,7 +76,7 @@ export default function Navigation({
                       <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
                     </div>
                   )}
-                  <span>{user ? user.name : 'Guest'}</span>
+                  <span>{loading ? "Loading..." : (user ? user.name : 'Guest')}</span>
                 </div>
                 <FontAwesomeIcon icon={faCaretDown} className="h-4 w-4 text-slate-400" />
               </button>
@@ -86,7 +90,11 @@ export default function Navigation({
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {user ? (
+                    {loading ? (
+                      <div className="px-4 py-2 text-sm text-slate-500 dark:text-slate-400">
+                        Loading...
+                      </div>
+                    ) : user ? (
                       <>
                         <Link href="/profile" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                           Profile

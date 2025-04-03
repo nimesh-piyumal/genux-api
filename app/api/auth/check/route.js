@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import clientPromise from '../../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
+import clientPromise from '../../../../lib/mongodb';
 
-// Secret key for JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
-
-// Make sure your auth check API returns the profile picture
 export async function GET(request) {
   try {
     // Get the token from cookies
@@ -15,7 +10,14 @@ export async function GET(request) {
     if (!token) {
       return NextResponse.json(
         { authenticated: false },
-        { status: 200 }
+        { 
+          status: 200,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        }
       );
     }
     
@@ -27,7 +29,14 @@ export async function GET(request) {
     } catch (error) {
       return NextResponse.json(
         { authenticated: false },
-        { status: 200 }
+        { 
+          status: 200,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        }
       );
     }
     
@@ -41,7 +50,14 @@ export async function GET(request) {
     if (!user) {
       return NextResponse.json(
         { authenticated: false },
-        { status: 200 }
+        { 
+          status: 200,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        }
       );
     }
     
@@ -58,18 +74,32 @@ export async function GET(request) {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
+          profilePicture: user.profilePicture,
           createdAt: user.createdAt,
-          lastLogin: user.lastLogin,
-          profilePicture: user.profilePicture // Make sure to include profile picture
+          lastLogin: user.lastLogin
         }
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
     );
   } catch (error) {
     console.error('Auth check error:', error);
     return NextResponse.json(
       { authenticated: false },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
     );
   }
 }

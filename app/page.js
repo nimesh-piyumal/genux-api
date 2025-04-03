@@ -60,6 +60,7 @@ export default function ApiDocumentation() {
     }).replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$1-$2').replace(',', '');
   });
   
+  // Update the initial useEffect to properly handle auth check
   useEffect(() => {
     // Update time every minute
     const intervalId = setInterval(() => {
@@ -77,7 +78,7 @@ export default function ApiDocumentation() {
       
       setCurrentTime(formattedTime);
     }, 60000); 
-
+  
     // Check system preference for dark mode
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setDarkMode(prefersDark);
@@ -85,7 +86,14 @@ export default function ApiDocumentation() {
     // Check if user is logged in
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/check');
+        setLoading(true); // Set loading to true while checking auth
+        const response = await fetch('/api/auth/check', {
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
         const data = await response.json();
         
         if (response.ok && data.authenticated && data.user) {
@@ -95,9 +103,11 @@ export default function ApiDocumentation() {
           console.log("User not authenticated");
           setUser(null);
         }
+        setLoading(false);
       } catch (error) {
         console.error('Auth check error:', error);
         setUser(null);
+        setLoading(false);
       }
     };
     
@@ -107,19 +117,17 @@ export default function ApiDocumentation() {
         const response = await fetch('/data/api-data.json');
         const data = await response.json();
         setApiData(data);
-        setLoading(false);
       } catch (error) {
         console.error("Error loading API data:", error);
-        setLoading(false);
       }
     };
-
+  
+    // Run both functions in parallel
     checkAuth();
     fetchApiData();
     
     return () => clearInterval(intervalId);
   }, []);
-
   
   // Add keyboard shortcut for search
   useEffect(() => {
@@ -264,7 +272,27 @@ export default function ApiDocumentation() {
       <ThreeBackground darkMode={darkMode} />
 
       {/* Top Navigation */}
-      < Navigation setSidebarOpen={setSidebarOpen} setShowUserMenu={setShowUserMenu} faSun={faSun} faMoon={faMoon} toggleDarkMode={toggleDarkMode} faSignOutAlt={faSignOutAlt} handleLogout={handleLogout} showUserMenu={showUserMenu} faCaretDown={faCaretDown} user={user} faUser={faUser} currentTime={currentTime} userMenuRef={userMenuRef} sidebarOpen={sidebarOpen} darkMode={darkMode} faBars={faBars} faCode={faCode} faClock={faClock} />
+      <Navigation 
+        setSidebarOpen={setSidebarOpen} 
+        setShowUserMenu={setShowUserMenu} 
+        faSun={faSun} 
+        faMoon={faMoon} 
+        toggleDarkMode={toggleDarkMode} 
+        faSignOutAlt={faSignOutAlt} 
+        handleLogout={handleLogout} 
+        showUserMenu={showUserMenu} 
+        faCaretDown={faCaretDown} 
+        user={user} 
+        faUser={faUser} 
+        currentTime={currentTime} 
+        userMenuRef={userMenuRef} 
+        sidebarOpen={sidebarOpen} 
+        darkMode={darkMode} 
+        faBars={faBars} 
+        faCode={faCode} 
+        faClock={faClock}
+        loading={loading}
+      />
 
       {/* Hero Section */}
       <HeroSection 
