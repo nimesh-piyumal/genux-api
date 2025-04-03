@@ -27,6 +27,7 @@ import Footer from './components/Footer';
 import HeroSection from './components/HeroSection';
 import ThreeBackground from './components/ThreeBackground';
 import CategorySidebar from './components/CategorySidebar';
+import Navigation from './components/Navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ApiDocumentation() {
@@ -82,16 +83,31 @@ export default function ApiDocumentation() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setDarkMode(prefersDark);
     
+    // Check if user is logged in
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (response.ok && data.authenticated && data.user) {
+          console.log("User authenticated:", data.user);
+          setUser(data.user);
+        } else {
+          console.log("User not authenticated");
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setUser(null);
+      }
+    };
+    
     // Fetch API data
     const fetchApiData = async () => {
       try {
         const response = await fetch('/data/api-data.json');
         const data = await response.json();
         setApiData(data);
-        // Remove this line to keep activeCategory as null (All APIs)
-        // if (data && data.categories) {
-        //   setActiveCategory(Object.keys(data.categories)[0]);
-        // }
         setLoading(false);
       } catch (error) {
         console.error("Error loading API data:", error);
@@ -99,6 +115,7 @@ export default function ApiDocumentation() {
       }
     };
 
+    checkAuth();
     fetchApiData();
     
     return () => clearInterval(intervalId);
@@ -124,6 +141,47 @@ export default function ApiDocumentation() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [searchQuery]);
+
+  // Handle clicks outside user menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Add this useEffect to check auth status when the component mounts
+  useEffect(() => {
+    // Check if user is logged in
+    const checkAuthStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        
+        if (response.ok && data.authenticated && data.user) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Auth status check error:', error);
+        setUser(null);
+      }
+    };
+    
+    checkAuthStatus();
+    
+    // Set up an interval to periodically check auth status
+    const intervalId = setInterval(checkAuthStatus, 300000); // Check every 5 minutes
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Process the API data for display
   const processedCategories = apiData ? Object.entries(apiData.categories).map(([name, endpointIds]) => ({
@@ -203,90 +261,11 @@ export default function ApiDocumentation() {
   }
 
   return (
-<div className={`min-h-screen font-sans relative ${darkMode ? 'dark bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-800'}`} style={{ zIndex: 1 }}>
-    <ThreeBackground darkMode={darkMode} />
+    <div className={`min-h-screen font-sans relative ${darkMode ? 'dark bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-800'}`} style={{ zIndex: 1 }}>
+      <ThreeBackground darkMode={darkMode} />
 
       {/* Top Navigation */}
-      <nav className={`${darkMode ? 'bg-slate-800/90 backdrop-blur-sm' : 'bg-white/90 backdrop-blur-sm'} shadow-sm sticky top-0 z-30`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <motion.button 
-                className="mr-4 p-2 rounded-full text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label="Toggle sidebar"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FontAwesomeIcon icon={faBars} className="h-5 w-5" />
-              </motion.button>
-              <div className="flex items-center">
-                <FontAwesomeIcon icon={faCode} className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <span className="ml-3 font-bold text-xl bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">GENUX API</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-full">
-                <FontAwesomeIcon icon={faClock} className="mr-2 text-blue-500" />
-                <span>{currentTime}</span>
-              </div>
-              
-              {/* User profile dropdown */}
-              <div className="relative" ref={userMenuRef}>
-                <button 
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center text-sm bg-slate-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <FontAwesomeIcon icon={faUser} className="mr-2 text-blue-500" />
-                  <span className="hidden sm:inline">{user ? user.name : 'Guest'}</span>
-                  <FontAwesomeIcon icon={faCaretDown} className="ml-2 h-3 w-3" />
-                </button>
-                
-                {/* Dropdown menu */}
-                {showUserMenu && (
-                  <motion.div 
-                    className="absolute right-0 mt-2 w-48 py-2 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-50"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {user ? (
-                      <>
-                        <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
-                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{user.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
-                        </div>
-                        <button 
-                          onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center"
-                        >
-                          <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                          Logout
-                        </button>
-                      </>
-                    ) : (
-                      <Link href="/login" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        Sign in
-                      </Link>
-                    )}
-                  </motion.div>
-                )}
-              </div>
-              
-              <motion.button 
-                onClick={toggleDarkMode}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FontAwesomeIcon icon={darkMode ? faSun : faMoon} className="h-5 w-5 text-blue-500" />
-              </motion.button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      < Navigation setSidebarOpen={setSidebarOpen} setShowUserMenu={setShowUserMenu} faSun={faSun} faMoon={faMoon} toggleDarkMode={toggleDarkMode} faSignOutAlt={faSignOutAlt} handleLogout={handleLogout} showUserMenu={showUserMenu} faCaretDown={faCaretDown} user={user} faUser={faUser} currentTime={currentTime} userMenuRef={userMenuRef} sidebarOpen={sidebarOpen} darkMode={darkMode} faBars={faBars} faCode={faCode} faClock={faClock} />
 
       {/* Hero Section */}
       <HeroSection 
@@ -520,7 +499,7 @@ export default function ApiDocumentation() {
   );
 }
 
-// Update the EndpointCard component to show active/inactive indicator
+// EndpointCard component 
 const EndpointCard = ({ endpoint, category, handleCopyPath, copiedPath, setSelectedEndpoint, darkMode }) => {
   return (
     <motion.div 

@@ -44,7 +44,7 @@ export async function POST(request) {
     // Create JWT token
     const token = jwt.sign(
       { 
-        userId: user._id,
+        userId: user._id.toString(), // Convert ObjectId to string
         email: user.email,
         name: user.name
       },
@@ -58,7 +58,7 @@ export async function POST(request) {
         success: true, 
         message: 'Login successful',
         user: {
-          id: user._id,
+          id: user._id.toString(),
           name: user.name,
           email: user.email
         }

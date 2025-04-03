@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import clientPromise from '../../../../lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 // Secret key for JWT
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
@@ -26,9 +27,9 @@ export async function GET(request) {
       const db = client.db('genux-api');
       const usersCollection = db.collection('users');
       
-      // Find user by ID
+      // Find user by ID - convert string ID to ObjectId
       const user = await usersCollection.findOne(
-        { _id: decoded.userId },
+        { _id: new ObjectId(decoded.userId) },
         { projection: { password: 0 } } // Exclude password
       );
       
@@ -44,7 +45,7 @@ export async function GET(request) {
         { 
           authenticated: true,
           user: {
-            id: user._id,
+            id: user._id.toString(),
             name: user.name,
             email: user.email
           }
@@ -52,6 +53,7 @@ export async function GET(request) {
         { status: 200 }
       );
     } catch (error) {
+      console.error('Token verification error:', error);
       // If verification fails, token is invalid
       return NextResponse.json(
         { authenticated: false },
