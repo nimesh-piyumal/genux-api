@@ -289,7 +289,7 @@ export default function ApiKeysComponent({ userId, darkMode }) {
               >
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                    Your New API Key (copy it now, you won't see it again)
+                    Your New API Key (copy it now, you won&apos;t see it again)
                   </h4>
                   <button 
                     onClick={() => setShowNewKey(false)}
@@ -332,7 +332,7 @@ export default function ApiKeysComponent({ userId, darkMode }) {
             </div>
           ) : apiKeys.length === 0 ? (
             <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-              You don't have any API keys yet.
+              You don&apos;t have any API keys yet.
             </div>
           ) : (
             <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
