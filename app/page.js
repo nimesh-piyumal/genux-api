@@ -39,8 +39,11 @@ export default function ApiDocumentation() {
   const [copiedPath, setCopiedPath] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Add this line to define the missing state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const searchInputRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const [currentTime, setCurrentTime] = useState(() => {
     const now = new Date();
@@ -166,6 +169,24 @@ export default function ApiDocumentation() {
   // Add this function to close the sidebar
   const closeSidebar = () => {
     setSidebarOpen(false);
+  };
+
+  // Add logout handler
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        // Reset user state
+        setUser(null);
+        // Redirect to login page
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   if (loading) {
