@@ -108,46 +108,86 @@ export default function ApiKeysComponent({ userId, darkMode }) {
     }
   };
 
-  const deleteApiKey = async (keyId) => {
-    // Fix line 245
+  // Fix for line 252 (in the API Keys List section)
+  {loading ? (
+    <div className="flex justify-center items-center py-8">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  ) : apiKeys.length === 0 ? (
     <div className="text-center py-8 text-slate-500 dark:text-slate-400">
       You don&apos;t have any API keys yet.
     </div>
-    
-    // Fix line 288
-    if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      setError('');
-      setSuccess('');
-      
-      const response = await fetch(`/api/apikeys/delete`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          keyId,
-        }),
-      });
-      
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete API key');
-      }
-      
-      // Refresh the list
-      fetchApiKeys();
-      
-      setSuccess('API key deleted successfully');
-    } catch (error) {
-      console.error('Error deleting API key:', error);
-      setError(error.message);
-    }
-  };
-
+  ) : (
+    <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+      <table className="w-full">
+        <thead className="bg-slate-50 dark:bg-slate-700/50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Name
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Key
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Created
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+          {apiKeys.map((key) => (
+            <tr key={key._id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                {key.name}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <div className="flex items-center">
+                  <code className="font-mono">
+                    {showKeys[key._id] 
+                      ? key.key 
+                      : `sk-${key.key.substring(3, 10)}...`}
+                  </code>
+                  <button
+                    onClick={() => toggleShowKey(key._id)}
+                    className="ml-2 p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                    title={showKeys[key._id] ? "Hide key" : "Show key"}
+                  >
+                    <FontAwesomeIcon icon={showKeys[key._id] ? faEyeSlash : faEye} />
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(key.key, key._id)}
+                    className="ml-1 p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                    title="Copy to clipboard"
+                  >
+                    <FontAwesomeIcon icon={faCopy} />
+                  </button>
+                  {copiedKey === key._id && (
+                    <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+                      Copied!
+                    </span>
+                  )}
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                {new Date(key.createdAt).toLocaleDateString()}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <button
+                  onClick={() => deleteApiKey(key._id)}
+                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                  title="Delete key"
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
   const toggleShowKey = (keyId) => {
     setShowKeys(prev => ({
       ...prev,
@@ -370,3 +410,37 @@ export default function ApiKeysComponent({ userId, darkMode }) {
     </motion.div>
   );
 }
+
+const deleteApiKey = async (keyId) => {
+  if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+    return;
+  }
+  
+  try {
+    setError('');
+    setSuccess('');
+    
+    const response = await fetch(`/api/apikeys/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        keyId,
+      }),
+    });
+    
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to delete API key');
+    }
+    
+    // Refresh the list
+    fetchApiKeys();
+    
+    setSuccess('API key deleted successfully');
+  } catch (error) {
+    console.error('Error deleting API key:', error);
+    setError(error.message);
+  }
+};

@@ -301,9 +301,11 @@ export default function ProfilePage() {
                   <div className="relative mb-4">
                     <div className={`h-32 w-32 rounded-full overflow-hidden border-4 ${darkMode ? 'border-slate-700' : 'border-slate-200'} bg-slate-100 dark:bg-slate-700 flex items-center justify-center`}>
                       {profilePicture ? (
-                        <img 
-                          src={profilePicture} 
-                          alt="Profile" 
+                        <Image
+                          src={profilePicture}
+                          alt="Profile"
+                          width={96}
+                          height={96}
                           className="h-full w-full object-cover"
                         />
                       ) : (
