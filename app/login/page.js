@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faLock, 
@@ -21,6 +21,8 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const audioRef = useRef(null);
 
   // Add useEffect to handle client-side mounting and auth check
   useEffect(() => {
@@ -50,6 +52,15 @@ export default function LoginPage() {
     checkAuth();
   }, []);
 
+  // Add effect to play audio when login is successful
+  useEffect(() => {
+    if (loginSuccess && audioRef.current) {
+      audioRef.current.play().catch(error => {
+        console.error("Audio playback failed:", error);
+      });
+    }
+  }, [loginSuccess]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -74,11 +85,16 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed');
       }
       
-      // Redirect to main page after successful login
-      window.location.href = '/';
+      // Set login success to trigger audio
+      setLoginSuccess(true);
+      
+      // Add a small delay before redirecting to allow audio to play
+      setTimeout(() => {
+        // Redirect to main page after successful login
+        window.location.href = '/';
+      }, 1500); // 1.5 second delay
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -93,6 +109,9 @@ export default function LoginPage() {
       <div className="absolute inset-0 z-0">
         <ThreeBackground darkMode={darkMode} />
       </div>
+      
+      {/* Add audio element */}
+      <audio ref={audioRef} src="https://files.catbox.moe/abctmn.mp3" preload="auto" />
       
       <Link href="/" className="absolute top-6 left-6 flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 z-10">
         <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />

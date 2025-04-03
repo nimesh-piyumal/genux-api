@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUser, 
@@ -27,6 +27,8 @@ export default function RegisterPage() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  // Add audio reference
+  const audioRef = useRef(null);
 
   // Add useEffect to handle client-side mounting and auth check
   useEffect(() => {
@@ -55,6 +57,15 @@ export default function RegisterPage() {
     
     checkAuth();
   }, []);
+
+  // Add effect to play audio when registered state changes to true
+  useEffect(() => {
+    if (registered && audioRef.current) {
+      audioRef.current.play().catch(error => {
+        console.error("Audio playback failed:", error);
+      });
+    }
+  }, [registered]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,6 +123,9 @@ export default function RegisterPage() {
         <div className="absolute inset-0 z-0">
           <ThreeBackground darkMode={darkMode} />
         </div>
+        
+        {/* Add audio element */}
+        <audio ref={audioRef} src="https://files.catbox.moe/abctmn.mp3" preload="auto" />
         
         <motion.div 
           className="w-full max-w-md p-8 rounded-xl shadow-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-center z-10"
