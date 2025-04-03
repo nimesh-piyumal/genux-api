@@ -21,6 +21,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ThreeBackground from '../components/ThreeBackground';
 import { useRouter } from 'next/navigation';
 
+// Add this import at the top of the file
+import ApiKeysComponent from '../components/ApiKeysComponent';
+
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,6 +56,11 @@ export default function ProfilePage() {
       try {
         const response = await fetch('/api/auth/check', {
           method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
         });
         
         const data = await response.json();
@@ -187,6 +195,7 @@ export default function ProfilePage() {
     return <div className="min-h-screen bg-slate-50 dark:bg-slate-900"></div>;
   }
 
+  // Return the main component
   return (
     <div className={`min-h-screen font-sans relative ${darkMode ? 'dark bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-800'}`}>
       <div className="absolute inset-0 z-0">
@@ -336,45 +345,6 @@ export default function ProfilePage() {
                   )}
                 </div>
                 
-                {/* Existing form fields */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FontAwesomeIcon icon={faUser} className="text-slate-400 dark:text-slate-500" />
-                    </div>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={!editMode}
-                      className={`block w-full pl-10 pr-3 py-2.5 border ${editMode ? 'border-slate-300 dark:border-slate-600' : 'border-transparent bg-slate-100 dark:bg-slate-700'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 text-slate-900 dark:text-slate-100`}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FontAwesomeIcon icon={faEnvelope} className="text-slate-400 dark:text-slate-500" />
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={!editMode}
-                      className={`block w-full pl-10 pr-3 py-2.5 border ${editMode ? 'border-slate-300 dark:border-slate-600' : 'border-transparent bg-slate-100 dark:bg-slate-700'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 text-slate-900 dark:text-slate-100`}
-                      required
-                    />
-                  </div>
-                </div>
-                
                 {editMode && (
                   <>
                     <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -470,6 +440,9 @@ export default function ProfilePage() {
             )}
           </div>
         </motion.div>
+        
+        {/* API Keys Section */}
+        <ApiKeysComponent userId={user?.id} darkMode={darkMode} />
       </div>
     </div>
   );
