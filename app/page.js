@@ -22,7 +22,6 @@ import {
   faBars,
   faSignOutAlt
 } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link';
 import Footer from './components/Footer';
 import HeroSection from './components/HeroSection';
 import ThreeBackground from './components/ThreeBackground';

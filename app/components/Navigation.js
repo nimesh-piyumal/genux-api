@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const Navigation = ({ setSidebarOpen, setShowUserMenu, faSun, faMoon, toggleDarkMode, faSignOutAlt, handleLogout, showUserMenu, faCaretDown, user, faUser, currentTime, darkMode, faBars, faCode, faClock, sidebarOpen, userMenuRef }) => {
 
