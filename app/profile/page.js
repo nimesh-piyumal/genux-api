@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUser, 
@@ -12,7 +12,9 @@ import {
   faTimes,
   faSignOutAlt,
   faMoon,
-  faSun
+  faSun,
+  faCamera,
+  faImage
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,8 +35,12 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
+  const [profilePicture, setProfilePicture] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Add useEffect to handle client-side mounting and auth check
+  // Update useEffect to properly handle profile picture from database
   useEffect(() => {
     setMounted(true);
     
@@ -55,6 +61,10 @@ export default function ProfilePage() {
           setUser(data.user);
           setName(data.user.name);
           setEmail(data.user.email);
+          // Make sure to set profile picture if it exists in the user data
+          if (data.user.profilePicture) {
+            setProfilePicture(data.user.profilePicture);
+          }
           setLoading(false);
         } else {
           // If not authenticated, redirect to login
@@ -88,6 +98,40 @@ export default function ProfilePage() {
     }
   };
 
+  // Add function to handle profile picture upload
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Check file size (limit to 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+    
+    // Check file type
+    if (!file.type.match('image.*')) {
+      setError('Please select an image file');
+      return;
+    }
+    
+    setIsUploading(true);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setProfilePicture(event.target.result);
+      setIsUploading(false);
+    };
+    
+    reader.onerror = () => {
+      setError('Failed to read the image file');
+      setIsUploading(false);
+    };
+    
+    reader.readAsDataURL(file);
+  };
+
+  // Update the handleUpdateProfile function to include profile picture
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setError('');
@@ -103,6 +147,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           name,
           email,
+          profilePicture,
           currentPassword: currentPassword || undefined,
           newPassword: newPassword || undefined,
         }),
@@ -119,6 +164,7 @@ export default function ProfilePage() {
         ...user,
         name,
         email,
+        profilePicture,
       });
       
       // Clear password fields
@@ -238,6 +284,59 @@ export default function ProfilePage() {
             
             <form onSubmit={handleUpdateProfile}>
               <div className="space-y-6">
+                {/* Profile Picture Section */}
+                <div className="flex flex-col items-center mb-6">
+                  <div className="relative mb-4">
+                    <div className={`h-32 w-32 rounded-full overflow-hidden border-4 ${darkMode ? 'border-slate-700' : 'border-slate-200'} bg-slate-100 dark:bg-slate-700 flex items-center justify-center`}>
+                      {profilePicture ? (
+                        <img 
+                          src={profilePicture} 
+                          alt="Profile" 
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <FontAwesomeIcon 
+                          icon={faUser} 
+                          className="h-16 w-16 text-slate-400 dark:text-slate-500" 
+                        />
+                      )}
+                      
+                      {isUploading && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {editMode && (
+                      <motion.button
+                        type="button"
+                        onClick={() => fileInputRef.current.click()}
+                        className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full shadow-lg"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <FontAwesomeIcon icon={faCamera} />
+                        <input 
+                          type="file" 
+                          ref={fileInputRef}
+                          onChange={handleProfilePictureChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </motion.button>
+                    )}
+                  </div>
+                  
+                  {editMode && (
+                    <div className="text-sm text-slate-500 dark:text-slate-400">
+                      <FontAwesomeIcon icon={faImage} className="mr-1" />
+                      Click the camera icon to upload a profile picture
+                    </div>
+                  )}
+                </div>
+                
+                {/* Existing form fields */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Full Name

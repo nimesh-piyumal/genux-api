@@ -28,7 +28,7 @@ export async function POST(request) {
     }
     
     // Get request data
-    const { name, email, currentPassword, newPassword } = await request.json();
+    const { name, email, profilePicture, currentPassword, newPassword } = await request.json();
     
     // Validate input
     if (!name || !email) {
@@ -70,6 +70,11 @@ export async function POST(request) {
       updatedAt: new Date()
     };
     
+    // Add profile picture if provided
+    if (profilePicture) {
+      updateData.profilePicture = profilePicture;
+    }
+    
     // Handle password change if requested
     if (newPassword) {
       // Verify current password
@@ -107,7 +112,8 @@ export async function POST(request) {
         user: {
           id: user._id.toString(),
           name: updateData.name,
-          email: updateData.email
+          email: updateData.email,
+          profilePicture: updateData.profilePicture || user.profilePicture
         }
       },
       { status: 200 }
