@@ -24,6 +24,9 @@ import { useRouter } from 'next/navigation';
 // Add this import at the top of the file
 import ApiKeysComponent from '../components/ApiKeysComponent';
 
+// Add this import at the top
+import Image from 'next/image';
+
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

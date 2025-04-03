@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+// Update the import statement
+import { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faKey, 
@@ -29,10 +30,10 @@ export default function ApiKeysComponent({ userId, darkMode }) {
   // Fetch API keys on component mount
   useEffect(() => {
     fetchApiKeys();
-  }, [userId]);
+  }, [userId, fetchApiKeys]);
 
-  // Update the fetchApiKeys function
-  const fetchApiKeys = async () => {
+  // Move fetchApiKeys function definition inside useCallback
+  const fetchApiKeys = useCallback(async () => {
     if (!userId) return;
     
     try {
@@ -59,7 +60,7 @@ export default function ApiKeysComponent({ userId, darkMode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   const createApiKey = async () => {
     if (!keyName.trim()) {
@@ -108,6 +109,12 @@ export default function ApiKeysComponent({ userId, darkMode }) {
   };
 
   const deleteApiKey = async (keyId) => {
+    // Fix line 245
+    <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+      You don&apos;t have any API keys yet.
+    </div>
+    
+    // Fix line 288
     if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
       return;
     }

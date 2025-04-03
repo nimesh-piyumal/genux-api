@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navigation({ 
   setSidebarOpen, 
@@ -65,9 +66,11 @@ export default function Navigation({
                     </div>
                   ) : user && user.profilePicture ? (
                     <div className="h-8 w-8 rounded-full overflow-hidden mr-2">
-                      <img 
+                      <Image 
                         src={user.profilePicture} 
                         alt={user.name} 
+                        width={32}
+                        height={32}
                         className="h-full w-full object-cover"
                       />
                     </div>
