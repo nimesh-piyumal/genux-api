@@ -59,9 +59,19 @@ export default function Navigation({
                 className="flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700"
               >
                 <div className="flex items-center">
-                  <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-2">
-                    <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
-                  </div>
+                  {user && user.profilePicture ? (
+                    <div className="h-8 w-8 rounded-full overflow-hidden mr-2">
+                      <img 
+                        src={user.profilePicture} 
+                        alt={user.name} 
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-2">
+                      <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
+                    </div>
+                  )}
                   <span>{user ? user.name : 'Guest'}</span>
                 </div>
                 <FontAwesomeIcon icon={faCaretDown} className="h-4 w-4 text-slate-400" />
