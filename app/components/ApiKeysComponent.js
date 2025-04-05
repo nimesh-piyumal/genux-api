@@ -28,7 +28,10 @@ export default function ApiKeysComponent({ userId, darkMode }) {
 
   // Move fetchApiKeys function definition inside useCallback
   const fetchApiKeys = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
@@ -47,10 +50,11 @@ export default function ApiKeysComponent({ userId, darkMode }) {
       }
       
       const data = await response.json();
-      setApiKeys(data.apiKeys || []);
+      setApiKeys(Array.isArray(data.apiKeys) ? data.apiKeys : []);
     } catch (error) {
       console.error('Error fetching API keys:', error);
-      setError('Failed to load API keys');
+      setError('Failed to load API keys: ' + (error.message || 'Unknown error'));
+      setApiKeys([]);
     } finally {
       setLoading(false);
     }
@@ -168,7 +172,7 @@ export default function ApiKeysComponent({ userId, darkMode }) {
           </h2>
           
           <motion.button
-            onClick={() => setShowNewKey(false)}
+            onClick={() => setShowNewKey(true)} // This was incorrectly set to false
             className="flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -317,7 +321,7 @@ export default function ApiKeysComponent({ userId, darkMode }) {
                           <code className="font-mono">
                             {showKeys[key._id] 
                               ? key.key 
-                              : `sk-${key.key.substring(3, 10)}...`}
+                              : `sk-${key.key && typeof key.key === 'string' ? key.key.substring(3, 10) : ''}...`}
                           </code>
                           <button
                             onClick={() => toggleShowKey(key._id)}
@@ -341,7 +345,7 @@ export default function ApiKeysComponent({ userId, darkMode }) {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
-                        {new Date(key.createdAt).toLocaleDateString()}
+                        {key.createdAt ? new Date(key.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <button
